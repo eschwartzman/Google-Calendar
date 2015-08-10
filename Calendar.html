@@ -1,0 +1,727 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="TEXT/css">
+h1{
+	color: IndianRed;
+	font:50px/50px Lucida;
+}
+body {
+	color: black; 
+	background: CornflowerBlue ;
+	font:15px/20px Georgia;
+	text-align: center;
+}
+div.muggle{
+font:18px/18px Lucida ;
+     text-align: center;
+     vertical-align: center;
+     
+    
+
+}
+table{
+	vertical-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font:20px/20px Lucida;
+	padding: 2px;
+}
+</style>
+	<title>Calendar</title>	
+	<h1>CSE330 Calendar</h1>
+
+
+		
+	<input type="text" id="username" placeholder="Username" />
+	<input type="password" id="password" placeholder="Password" /><br>
+	<button type="button" id="logIn">Log In</button>
+	<button type="button" id="signUp">Sign Up</button>
+	<button type="button" id="logOut">Log Out</button>
+	<div id="txt" class="muggle"> </div>
+	<table id='table'></table>
+	<button type="button" id="next_month_btn"> Next Month</button>
+	<button type="button" id="last_month_btn"> Previous Month</button><br>
+	<button type="button" id="event_show"> Show Events</button><br>
+	<input type="text" id="catagory_name" placeholder="Catagory" /><br>
+	<button type="button" id="cat_update"> Sort by Categories</button><br>
+	<button type="button" id="event_execute"> Add Event</button><br>
+	<input type="text" id="title_e" placeholder="Title" />
+	<input type="text" id="month_e" placeholder="Month (as digit)" />
+	<input type="text" id="date_e" placeholder="Date (as digit)" />
+	<input type="text" id="time_e" placeholder="Time" />
+	<input type="text" id="cat_e" placeholder="Catagory" /><br>
+	<button type="button" id="event_delete"> Delete</button><br>
+	<input type="text" id="delete_title" placeholder="Event To Delete" /><br><br>
+	<button type="button" id="event_update"> Update</button><br>
+	<input type="text" id="title_of_edit_event" placeholder="Event to edit" />
+	<input type="text" id="title_of_edited_event" placeholder="New title" />
+	<input type="text" id="date_of_edited_event" placeholder="New date (as digit)" />
+	<input type="text" id="time_of_edited_event" placeholder="New time" />
+	<input type="text" id="month_of_edited_event" placeholder="New month (as digit)" />
+	<input type="text" id="catagory_name2" placeholder="New catagory" /><br><br>
+	<button type="button" id="event_share"> Share</button><br>
+	<input type="text" id="shared_person" placeholder="User to share with" />
+	<input type="text" id="shared_event" placeholder="Title of event to share" />
+	
+	
+	
+	
+
+
+
+
+	<script  type="text/javascript">
+	var jsonData;
+	//login
+	function logIn(event){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value; 
+		var password = document.getElementById("password").value;
+		var dataString = "username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/login_ajax.php", true); 
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); 
+		xmlHttp.addEventListener("load", function(event){
+			 jsonData = JSON.parse(event.target.responseText); 
+			if(jsonData.success){  
+				alert("You've Been Logged In!");
+				document.getElementById("logOut").style.visibility = 'visible';
+				document.getElementById("next_month_btn").style.visibility = 'visible';
+				document.getElementById("last_month_btn").style.visibility = 'visible';
+				document.getElementById("event_execute").style.visibility = 'visible';
+				document.getElementById("date_e").style.visibility = 'visible';
+				document.getElementById("title_e").style.visibility = 'visible';
+				document.getElementById("time_e").style.visibility = 'visible';
+				document.getElementById("event_show").style.visibility = 'visible';
+				document.getElementById("event_delete").style.visibility = 'visible';
+				document.getElementById("delete_title").style.visibility = 'visible';
+				document.getElementById("event_update").style.visibility = 'visible';
+				document.getElementById("title_of_edit_event").style.visibility = 'visible';
+				document.getElementById("date_of_edited_event").style.visibility = 'visible';
+				document.getElementById("time_of_edited_event").style.visibility = 'visible';
+				document.getElementById("title_of_edited_event").style.visibility = 'visible';
+				document.getElementById("txt").style.visibility = 'visible';
+				document.getElementById("catagory_name").style.visibility = 'visible';
+				document.getElementById("cat_update").style.visibility = 'visible';
+				document.getElementById("cat_e").style.visibility = 'visible';
+				document.getElementById("catagory_name2").style.visibility = 'visible';
+				document.getElementById("shared_person").style.visibility = 'visible';
+				document.getElementById("shared_event").style.visibility = 'visible';
+				document.getElementById("event_share").style.visibility = 'visible';
+				document.getElementById("month_e").style.visibility = 'visible';
+				document.getElementById("month_of_edited_event").style.visibility = 'visible';
+
+				var body = document.getElementById("table");
+				body.innerHTML = "";
+				updateCalendar(currentMonth);
+			}
+			else if(jsonData.blank){ 
+				alert("Please enter valid information");
+
+			}else{
+				alert(jsonData.message);
+			}
+		}, false); 
+		xmlHttp.send(dataString);  
+	}
+	//signup	
+	function signUp(event){
+		var xmlHttp2 = new XMLHttpRequest();
+		var username2 = document.getElementById("username").value; 
+		var password2 = document.getElementById("password").value;
+		var dataString2 = "username=" + encodeURIComponent(username2) + "&password=" + encodeURIComponent(password2);
+		xmlHttp2.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/signUp_ajax.php", true); 
+		xmlHttp2.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); 
+		xmlHttp2.addEventListener("load", function(event){
+			 jsonData = JSON.parse(event.target.responseText); 
+			if(jsonData.success){ 
+				alert("Signed Up");
+				document.getElementById("logOut").style.visibility = 'visible';
+				document.getElementById("next_month_btn").style.visibility = 'visible';
+				document.getElementById("last_month_btn").style.visibility = 'visible';
+				document.getElementById("event_execute").style.visibility = 'visible';
+				document.getElementById("date_e").style.visibility = 'visible';
+				document.getElementById("title_e").style.visibility = 'visible';
+				document.getElementById("time_e").style.visibility = 'visible';
+				document.getElementById("event_show").style.visibility = 'visible';
+				document.getElementById("event_delete").style.visibility = 'visible';
+				document.getElementById("delete_title").style.visibility = 'visible';
+				document.getElementById("event_update").style.visibility = 'visible';
+				document.getElementById("title_of_edit_event").style.visibility = 'visible';
+				document.getElementById("date_of_edited_event").style.visibility = 'visible';
+				document.getElementById("time_of_edited_event").style.visibility = 'visible';
+				document.getElementById("title_of_edited_event").style.visibility = 'visible';
+				document.getElementById("txt").style.visibility = 'visible';
+				document.getElementById("catagory_name").style.visibility = 'visible';
+				document.getElementById("cat_update").style.visibility = 'visible';
+				document.getElementById("cat_e").style.visibility = 'visible';
+				document.getElementById("catagory_name2").style.visibility = 'visible';
+				document.getElementById("shared_person").style.visibility = 'visible';
+				document.getElementById("shared_event").style.visibility = 'visible';
+				document.getElementById("event_share").style.visibility = 'visible';
+				document.getElementById("month_e").style.visibility = 'visible';
+				document.getElementById("month_of_edited_event").style.visibility = 'visible';
+
+				var body = document.getElementById("table");
+				body.innerHTML = "";
+				updateCalendar(currentMonth);
+			}
+			else if(jsonData.blank){ 
+				alert("Please enter valid information");
+			}
+			else{
+				alert(jsonData.message);
+			} 
+		}, false); 
+		xmlHttp2.send(dataString2); 
+	}
+	//logout
+	function logOut(){
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/logOut_ajax.php", true);
+		xmlHttp.send(null);
+		alert("Logged Out");
+		document.getElementById("logOut").style.visibility = 'hidden';
+		document.getElementById("next_month_btn").style.visibility = 'hidden';
+		document.getElementById("last_month_btn").style.visibility = 'hidden';
+		document.getElementById("event_execute").style.visibility = 'hidden';
+		document.getElementById("date_e").style.visibility = 'hidden';
+		document.getElementById("title_e").style.visibility = 'hidden';
+		document.getElementById("time_e").style.visibility = 'hidden';
+		document.getElementById("event_show").style.visibility = 'hidden';
+		document.getElementById("event_delete").style.visibility = 'hidden';
+		document.getElementById("delete_title").style.visibility = 'hidden';
+		document.getElementById("event_update").style.visibility = 'hidden';
+		document.getElementById("title_of_edit_event").style.visibility = 'hidden';
+		document.getElementById("date_of_edited_event").style.visibility = 'hidden';
+		document.getElementById("time_of_edited_event").style.visibility = 'hidden';
+		document.getElementById("title_of_edited_event").style.visibility = 'hidden';
+		document.getElementById("username").value='';
+		document.getElementById("password").value='';
+		document.getElementById("date_e").value='';
+		document.getElementById("time_e").value='';
+		document.getElementById("title_e").value='';
+		document.getElementById("delete_title").value='';
+		document.getElementById("title_of_edit_event").value='';
+		document.getElementById("date_of_edited_event").value='';
+		document.getElementById("time_of_edited_event").value='';
+		document.getElementById("title_of_edited_event").value='';
+		document.getElementById("shared_person").value = '';
+		document.getElementById("shared_event").value = '';
+		document.getElementById("catagory_name").style.visibility = 'hidden';
+		document.getElementById("cat_update").style.visibility = 'hidden';
+		document.getElementById("catagory_name").value='';
+		document.getElementById("cat_e").value='';
+		document.getElementById("month_of_edited_event").value='';
+		document.getElementById("month_e").value='';
+		document.getElementById("cat_e").style.visibility = 'hidden';
+		document.getElementById("catagory_name2").style.visibility = 'hidden';
+		document.getElementById("catagory_name2").value='';
+		document.getElementById("shared_person").style.visibility = 'hidden';
+		document.getElementById("shared_event").style.visibility = 'hidden';
+		document.getElementById("event_share").style.visibility = 'hidden';
+		document.getElementById("month_e").style.visibility = 'hidden';
+		document.getElementById("month_of_edited_event").style.visibility = 'hidden';
+
+		var body = document.getElementById("table");
+		var table78 = document.getElementById("txt");
+		body.innerHTML = "";
+	}	
+	//create events
+	function addEvents(event){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value;
+		var date_e = document.getElementById("date_e").value;
+		var title_e = document.getElementById("title_e").value;
+		var time_e = document.getElementById("time_e").value;
+		var cat_e = document.getElementById("cat_e").value;
+		var month_e = document.getElementById("month_e").value;
+		var dataString2 = "username=" + encodeURIComponent(username) + "&date_e=" + encodeURIComponent(date_e) + "&title_e=" + 	   encodeURIComponent(title_e) + "&time_e=" + encodeURIComponent(time_e)+ "&cat_e=" + encodeURIComponent(cat_e) + "&month_e=" + encodeURIComponent(month_e);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/Create_Events_Ajax.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlHttp.addEventListener("load", function(event){
+			jsonData = JSON.parse(event.target.responseText); 
+			if(jsonData.success){  
+				alert("Event Recorded");
+			}
+			else if(jsonData.blank){ 
+				alert("Please enter valid information");
+			}else{
+				alert(jsonData.message);
+			}
+		}, false); 
+		xmlHttp.send(dataString2);  
+	}
+	//show the events on the calendar
+	function showEvents(event){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value;
+		var dataString2 = "username=" + encodeURIComponent(username);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/Display_Events_Ajax.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlHttp.addEventListener("load", function(event){
+		jsonData = JSON.parse(event.target.responseText); 
+			for(var a=0; a<jsonData.length; a++){
+				for(var i=0; i<31; i++){
+					 intvalue = parseInt(jsonData[a].date);
+					 intValue2 =parseInt(jsonData[a].month);
+					if((intvalue === i) &&(intValue2 === currentMonth.month+1)){
+						document.getElementById(intvalue).innerHTML=(intvalue+"<br> "+"Title:"+" "+jsonData[a].title+"<br>"+"Time:"+" "+jsonData[a].time);
+					}
+				}
+			}	
+		}, false); 
+		xmlHttp.send(dataString2);  
+	}
+
+	//sort by catagory
+	function showCatagories(event){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value;
+		var catagory = document.getElementById("catagory_name").value
+		var dataString2 = "username=" + encodeURIComponent(username) + "&catagory=" + encodeURIComponent(catagory);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/Catagories_Cal_Ajax.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlHttp.addEventListener("load", function(event){
+		jsonData = JSON.parse(event.target.responseText); 
+			for(var a=0; a<jsonData.length; a++){
+				for(var i=0; i<31; i++){
+					 intvalue = parseInt(jsonData[a].date);
+					 intValue2 =parseInt(jsonData[a].month);
+					if((intvalue === i) &&(intValue2 === currentMonth.month+1) &&(jsonData[a].catagory === document.getElementById("catagory_name").value)) {
+						document.getElementById(intvalue).innerHTML=(intvalue+"<br> "+"Title:"+" "+jsonData[a].title+"<br>"+"Time:"+" "+jsonData[a].time+"<br>"+"Catagory:"+" "+jsonData[a].catagory);
+					}
+				}
+			}	
+		}, false); 
+		xmlHttp.send(dataString2);  
+	}
+		//delete events
+		function deleteEvents(event){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value;
+		var delete_title = document.getElementById("delete_title").value;
+		var dataString2 = "username=" + encodeURIComponent(username) + "&delete_title=" + encodeURIComponent(delete_title);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/Delete_Events_Ajax.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlHttp.addEventListener("load", function(event){
+		jsonData = JSON.parse(event.target.responseText); 
+			if(jsonData.blank){
+				alert("Invalid Information");
+			}
+			else if(jsonData.success){ 
+				alert("The event"+ " "+jsonData.Title + " " + "has been deleted" );
+			}	
+		}, false); 
+		xmlHttp.send(dataString2);  
+	}
+	//modify events
+	function updateEvents(events){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value;
+		var title_of_edit_event = document.getElementById("title_of_edit_event").value;
+		var date_of_edited_event = document.getElementById("date_of_edited_event").value;
+		var time_of_edited_event = document.getElementById("time_of_edited_event").value;
+		var title_of_edited_event = document.getElementById("title_of_edited_event").value;
+		var month_of_edited_event = document.getElementById("month_of_edited_event").value;
+		var catagory_name2 = document.getElementById("catagory_name2").value
+		var dataString2 = "username=" + encodeURIComponent(username) + "&title_of_edit_event=" + encodeURIComponent(title_of_edit_event) + "&date_of_edited_event=" + encodeURIComponent(date_of_edited_event) + "&time_of_edited_event=" + encodeURIComponent(time_of_edited_event) + "&title_of_edited_event=" + encodeURIComponent(title_of_edited_event) + "&catagory_name2=" + encodeURIComponent(catagory_name2) + "&month_of_edited_event=" + encodeURIComponent(month_of_edited_event);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/Update_Events_Ajax.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlHttp.addEventListener("load", function(event){
+		jsonData = JSON.parse(event.target.responseText); 
+			if(jsonData.blank){
+				alert("Invalid Information");
+			}
+			else if(jsonData.success){  
+				alert(jsonData.Old_Title + " "+ "has been modifyed to" + " "+ jsonData.New_Title);
+			}
+		}, false); 
+		xmlHttp.send(dataString2);  
+	}
+
+	//share events with other users
+	function shareEvents(events){
+		var xmlHttp = new XMLHttpRequest();
+		var username = document.getElementById("username").value;
+		var shared_person = document.getElementById("shared_person").value;
+		var shared_event = document.getElementById("shared_event").value;
+		var catagory_name2 = document.getElementById("catagory_name2").value
+		var dataString2 = "username=" + encodeURIComponent(username) + "&shared_event=" + encodeURIComponent(shared_event) + "&shared_person=" + encodeURIComponent(shared_person);
+		xmlHttp.open("POST", "http://ec2-54-164-138-11.compute-1.amazonaws.com/~EvanSchwartzman/Share_User_Ajax.php", true);
+		xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xmlHttp.addEventListener("load", function(event){
+		jsonData = JSON.parse(event.target.responseText); 
+			if(jsonData.blank){
+				alert("Invalid Information");
+			}
+			if(jsonData.success){  
+				alert(jsonData.SharedE + " "+ "has been shared with" + " "+ jsonData.SharedP);
+			}
+		}, false); 
+		xmlHttp.send(dataString2);  
+
+	}
+//calendar month
+	(function () {
+		"use strict";
+
+	/* Date.prototype.deltaDays(n)
+	 * 
+	 * Returns a Date object n days in the future.
+	 */
+	 Date.prototype.deltaDays = function (n) {
+		// relies on the Date object to automatically wrap between months for us
+		return new Date(this.getFullYear(), this.getMonth(), this.getDate() + n);
+	};
+
+	/* Date.prototype.getSunday()
+	 * 
+	 * Returns the Sunday nearest in the past to this date (inclusive)
+	 */
+	 Date.prototype.getSunday = function () {
+	 	return this.deltaDays(-1 * this.getDay());
+	 };
+	}());
+
+/** Week
+ * 
+ * Represents a week.
+ * 
+ * Functions (Methods):
+ *	.nextWeek() returns a Week object sequentially in the future
+ *	.prevWeek() returns a Week object sequentially in the past
+ *	.contains(date) returns true if this week's sunday is the same
+ *		as date's sunday; false otherwise
+ *	.getDates() returns an Array containing 7 Date objects, each representing
+ *		one of the seven days in this month
+ */
+ function Week(initial_d) {
+ 	"use strict";
+
+ 	this.sunday = initial_d.getSunday();
+
+
+ 	this.nextWeek = function () {
+ 		return new Week(this.sunday.deltaDays(7));
+ 	};
+
+ 	this.prevWeek = function () {
+ 		return new Week(this.sunday.deltaDays(-7));
+ 	};
+
+ 	this.contains = function (d) {
+ 		return (this.sunday.valueOf() === d.getSunday().valueOf());
+ 	};
+
+ 	this.getDates = function () {
+ 		var dates = [];
+ 		for(var i=0; i<7; i++){
+ 			dates.push(this.sunday.deltaDays(i));
+ 		}
+ 		return dates;
+ 	};
+ }
+
+/** Month
+ * 
+ * Represents a month.
+ * 
+ * Properties:
+ *	.year == the year associated with the month
+ *	.month == the month number (January = 0)
+ * 
+ * Functions (Methods):
+ *	.nextMonth() returns a Month object sequentially in the future
+ *	.prevMonth() returns a Month object sequentially in the past
+ *	.getDateObject(d) returns a Date object representing the date
+ *		d in the month
+ *	.getWeeks() returns an Array containing all weeks spanned by the
+ *		month; the weeks are represented as Week objects
+ */
+ function Month(year, month) {
+ 	"use strict";
+
+ 	this.year = year;
+ 	this.month = month;
+
+ 	this.nextMonth = function () {
+ 		return new Month( year + Math.floor((month+1)/12), (month+1) % 12);
+ 	};
+
+ 	this.prevMonth = function () {
+ 		return new Month( year + Math.floor((month-1)/12), (month+11) % 12);
+ 	};
+
+ 	this.getDateObject = function(d) {
+ 		return new Date(this.year, this.month, d);
+ 	};
+
+ 	this.getWeeks = function () {
+ 		var firstDay = this.getDateObject(1);
+ 		var lastDay = this.nextMonth().getDateObject(0);
+
+ 		var weeks = [];
+ 		var currweek = new Week(firstDay);
+ 		weeks.push(currweek);
+ 		while(!currweek.contains(lastDay)){
+ 			currweek = currweek.nextWeek();
+ 			weeks.push(currweek);
+ 		}
+
+ 		return weeks;
+ 	};
+ }
+ //clock math
+function getTime() {
+// initialize time-related variables with current time settings
+var now = new Date();
+var hour = now.getHours();
+var minute = now.getMinutes();
+now = null;
+var ampm = "" ;
+
+// validate hour values and set value of ampm
+if (hour >= 12) {
+hour -= 12;
+ampm = "PM";
+} else
+ampm = "AM";
+hour = (hour == 0) ? 12 : hour;
+
+// add zero digit to a one digit minute
+if (minute < 10)
+minute = "0" + minute; 
+// return time string
+return hour + ":" + minute + " " + ampm;
+}
+function getSeconds(){
+    var now =new Date();
+    var seconds = now.getSeconds();
+    document.getElementById('txt').innerHTML = ("The Time Is" + " "+ getTime() + " " + seconds);
+    var t = setTimeout(function(){getSeconds()},500);
+}
+//draw the calendar
+function tableCreate(currentMonth) {
+    var currentMonth = currentMonth;
+    var MonthN = currentMonth.month;
+    var MonthNa = getMonthName(MonthN);
+    var MonthLe = getDays(MonthN);
+    var Today = new Date();
+    var now = Today.getMonth();
+
+// Days in each month
+function getDays(month, year) {
+    var ar = new Array(12)
+    ar[0] = 31 // January
+    ar[1] = 28  // February
+    ar[2] = 31 // March
+    ar[3] = 30 // April
+    ar[4] = 31 // May
+    ar[5] = 30 // June
+    ar[6] = 31 // July
+    ar[7] = 31 // August
+    ar[8] = 30 // September
+    ar[9] = 31 // October
+    ar[10] = 30 // November
+    ar[11] = 31 // December
+    return ar[month]
+}
+// Convert JS month numbers into English month names
+function getMonthName(month) {
+    var ar = new Array(12)
+    ar[0] = "January"
+    ar[1] = "February"
+    ar[2] = "March"
+    ar[3] = "April"
+    ar[4] = "May"
+    ar[5] = "June"
+    ar[6] = "July"
+    ar[7] = "August"
+    ar[8] = "September"
+    ar[9] = "October"
+    ar[10] = "November"
+    ar[11] = "December"
+    return ar[month]
+}
+//make rows for information about month, year, and day
+var row_month = document.createElement("tr");
+var Cal_Info_Header = document.createTextNode(MonthNa + " " + currentMonth.year + " "); 
+var row_cell = document.createElement("td");  
+var row_cell1 = document.createElement("td");  
+var row_cell2 = document.createElement("td");  
+var row_cell3 = document.createElement("td");  
+var row_cell4 = document.createElement("td");  
+var row_cell5 = document.createElement("td");  
+var row_cell6 = document.createElement("td"); 
+var time_cell = document.createTextNode("Time:" + " "+ getTime()); 
+var body = document.getElementById("table");
+var tbl = document.createElement("table");
+var tblBody = document.createElement("tbody");
+var row_days = document.createElement("tr");
+var cellText2 = document.createTextNode("Sunday"); 
+var cell2 = document.createElement("td");        
+var cellText3 = document.createTextNode("Monday"); 
+var cell3 = document.createElement("td");        
+var cellText4 = document.createTextNode("Tuesday"); 
+var cell4 = document.createElement("td"); 
+var cellText5 = document.createTextNode("Wednesday"); 
+var cell5 = document.createElement("td"); 
+var cellText6 = document.createTextNode("Thursday"); 
+var cell6 = document.createElement("td"); 
+var cellText7 = document.createTextNode("Friday"); 
+var cell7 = document.createElement("td"); 
+var cellText8 = document.createTextNode("Saturday"); 
+var cell8 = document.createElement("td");  
+
+
+
+// declaration and initialization 
+var digit = 1
+var curCell = 0
+var date = Today.getDate();
+var firstDayInstance = new Date(currentMonth.year, currentMonth.month, 1);
+var firstDay = firstDayInstance.getDay();
+	//make calendar
+        for (var j = 0; j < 6; j++) {
+        var row = document.createElement("tr");
+            for (var i = 0; i < 7; i++) {
+                var cell_test = document.createElement("td"); 
+                if (curCell < firstDay){
+                    var cell_op = document.createTextNode(" "); 
+                    cell_test.appendChild(cell_op); 
+                    curCell++;
+                }else if (curCell === firstDay){
+                    var cellText = document.createTextNode(digit); 
+                    cell_test.appendChild(cellText);
+                    var textbox=document.createTextNode("");
+                    cell_test.setAttribute("id",digit);
+                    cell_test.appendChild(textbox);
+                    digit++;
+                    if ((digit -1 === Today.getDate()) && (Today.getMonth() === currentMonth.month)){
+                    cell_test.setAttribute("style", "background-color: IndianRed ;" );
+                }
+                }
+                row.appendChild(cell_test);
+                if (digit-1 > MonthLe){
+                    console.log((MonthLe%7));
+                    console.log(MonthLe);
+                    cellText.nodeValue = ""; 
+                    textbox.nodeValue="";
+                    cell_test.appendChild(cellText);
+                    cell_test.appendChild(textbox);
+                    break;
+                }
+            }
+            //appending
+            cell2.appendChild(cellText2);
+            cell3.appendChild(cellText3);
+            cell4.appendChild(cellText4);
+            cell5.appendChild(cellText5);
+            cell6.appendChild(cellText6);
+            cell7.appendChild(cellText7);
+            cell8.appendChild(cellText8);
+            row_days.appendChild(cell2);
+            row_days.appendChild(cell3);
+            row_days.appendChild(cell4);
+            row_days.appendChild(cell5);
+            row_days.appendChild(cell6);
+            row_days.appendChild(cell7);
+            row_days.appendChild(cell8);
+            row_cell4.appendChild(Cal_Info_Header);
+            row_cell.appendChild(row_cell4);
+            row_month.appendChild(row_cell1);
+            row_month.appendChild(row_cell2);
+            row_month.appendChild(row_cell3);
+            row_month.appendChild(row_cell4);
+            row_month.appendChild(row_cell);
+            row_cell4.setAttribute("style", "background-color: IndianRed  ;");
+            row_cell3.setAttribute("style", "background-color: Bisque  ;");
+            row_cell3.setAttribute("align", "center" );
+            row_cell.setAttribute("style", "background-color: Bisque  ;");
+            row_cell.setAttribute("align", "center")
+            row_days.setAttribute("style", "background-color: Bisque  ;");
+            row_days.setAttribute("align", "center");
+            row_days.setAttribute("width", "300");
+            row_days.setAttribute("height", "50");
+            row.setAttribute("align", "center");
+            row.setAttribute("style", "background-color: CornflowerBlue ;");
+            row_month.setAttribute("height", "50");
+            tblBody.insertBefore(row_days, tblBody.firstChild);
+            tblBody.insertBefore(row_month, tblBody.firstChild);
+            tblBody.setAttribute("width","300");
+            tblBody.appendChild(row);
+        }
+        tbl.appendChild(tblBody);
+        body.appendChild(tbl);
+        tbl.setAttribute("height", "900");
+        tbl.setAttribute("width", "300");
+        tbl.setAttribute("align", "center");
+        tbl.setAttribute("style", "border-color: CornflowerBlue ;");
+        document.getElementById("txt").setAttribute("style", "background-color: Bisque  ;" )
+        document.getElementById("txt").setAttribute("height", " 50" )
+    }
+    //call calendar
+    function updateCalendar(currentMonth){
+        tableCreate(currentMonth);
+    }
+   var currentMonth;
+   addEventListener("DOMContentLoaded",function(event){
+        currentMonth = new Month(2014,9);
+        updateCalendar(currentMonth);
+    }, false);
+    document.getElementById("next_month_btn").addEventListener("click", function(event){
+    var body = document.getElementById("table");
+    body.innerHTML = "";
+    currentMonth = currentMonth.nextMonth(); 
+    updateCalendar(currentMonth); 
+}, false);
+    document.getElementById("last_month_btn").addEventListener("click", function(event){
+    var body = document.getElementById("table");
+    body.innerHTML = "";
+    currentMonth = currentMonth.prevMonth(); 
+    updateCalendar(currentMonth); 
+}, false);
+
+addEventListener("DOMContentLoaded",function(event){
+    getSeconds();
+}, false);
+//hide buttons
+document.getElementById("logIn").addEventListener("click", logIn, false);
+document.getElementById("signUp").addEventListener("click", signUp, false);
+document.getElementById("logOut").addEventListener("click", logOut, false);
+document.getElementById("event_execute").addEventListener("click", addEvents, false);
+document.getElementById("event_show").addEventListener("click", showEvents, false);
+document.getElementById("event_delete").addEventListener("click", deleteEvents, false);
+document.getElementById("event_update").addEventListener("click", updateEvents, false);
+document.getElementById("cat_update").addEventListener("click", showCatagories, false);
+document.getElementById("event_share").addEventListener("click", shareEvents, false);
+document.getElementById("logOut").style.visibility = 'hidden';
+document.getElementById("next_month_btn").style.visibility = 'hidden';
+document.getElementById("last_month_btn").style.visibility = 'hidden';
+document.getElementById("event_execute").style.visibility = 'hidden';
+document.getElementById("date_e").style.visibility = 'hidden';
+document.getElementById("title_e").style.visibility = 'hidden';
+document.getElementById("time_e").style.visibility = 'hidden';
+document.getElementById("event_show").style.visibility = 'hidden';
+document.getElementById("event_delete").style.visibility = 'hidden';
+document.getElementById("delete_title").style.visibility = 'hidden';
+document.getElementById("event_update").style.visibility = 'hidden';
+document.getElementById("title_of_edit_event").style.visibility = 'hidden';
+document.getElementById("date_of_edited_event").style.visibility = 'hidden';
+document.getElementById("time_of_edited_event").style.visibility = 'hidden';
+document.getElementById("title_of_edited_event").style.visibility = 'hidden';
+document.getElementById("txt").style.visibility = 'hidden';
+document.getElementById("catagory_name").style.visibility = 'hidden';
+document.getElementById("cat_update").style.visibility = 'hidden';
+document.getElementById("cat_e").style.visibility = 'hidden';
+document.getElementById("catagory_name2").style.visibility = 'hidden';
+document.getElementById("shared_person").style.visibility = 'hidden';
+document.getElementById("shared_event").style.visibility = 'hidden';
+document.getElementById("event_share").style.visibility = 'hidden';
+document.getElementById("month_e").style.visibility = 'hidden';
+document.getElementById("month_of_edited_event").style.visibility = 'hidden';
+</script>
+</body>
+</html>
